@@ -1,0 +1,197 @@
+<project name="Build Servlet and JSP" default="all" basedir=".">
+
+  <!-- set property -->
+  <property environment="env"/>
+  <property file="build.properties" />
+
+  <property name="execdir"      value="./exec" />
+  <property name="jardir"       value="./jar" />
+  <property name="data"         value="data" />
+  <property name="classes_sub"  value="classes" />
+  <property name="classes"      value="${execdir}/${classes_sub}" />
+  <property name="src_classes"  value="../class" />
+  <property name="ulib"         value="${src_classes}/sio29/ulib" />
+  <property name="ulib_src"     value="../ulib" />
+  <property name="ulib_jar"     value="${src_classes}/ulib" />
+  <property name="build"        value="./build" />
+  <property name="source"       value="./src" />
+  <property name="htdocs"       value="./htdocs" />
+  <property name="javadoc"      value="./javadoc" />
+  <property name="jarfile"      value="${execdir}/JzEditor.jar" />
+  <property name="jarfile_main" value="JzEditor_main.jar" />
+  <property name="jarfile_and"  value="JzEditor_and.jar" />
+  <property name="jarfile_tvm"  value="JzEditor_tvm.jar" />
+  <property name="mainname"     value="sio29.jzeditor.backends.j2d.JzEditor" />
+  <property name="icon"         value="icon.png" />
+  
+  <property name="dst_datadir" value="${build}/sio29/jzeditor/data" />
+  
+  <property file="${ulib_src}/ulib.properties" />
+  <property name="classpath"    value=".;${classpath_ulib};" />
+  <property name="jar_classpath" value="." />
+  
+  
+<!--
+  <echo message="jar_classpath=${jar_classpath}" />
+  <echo message="classpath=${classpath}" />
+-->
+
+  <target name="all" depends="init,compile,jar" />
+<!--
+  <target name="all" depends="make_umat,make_udlgbase,init,compile,jar" />
+  <target name="all" depends="make_ufile,make_udlgbase,init,compile,jar" />
+-->
+
+  <target name="make_ufile" >
+     <ant dir="${ulib_src}/ufile/" antfile="build.xml" target="all" inheritAll="false" />
+  </target>
+  <target name="make_udlgbase" >
+     <ant dir="${ulib_src}/udlgbase/" antfile="build.xml" target="all" inheritAll="false" />
+  </target>
+  <target name="make_umat" >
+     <ant dir="${ulib_src}/umat/" antfile="build.xml" target="all" inheritAll="false" />
+  </target>
+
+  <!-- ulib Copy -->
+  <target name="ulib_copy" >
+  	<unjar src="${ulib_jar}/${ulib_name}.jar" dest="${build}">
+  		<patternset>
+  			<exclude name="META-INF/*" />
+  			<exclude name="META-INF" />
+  		</patternset>
+  	</unjar>
+  	<touch datetime="01/01/2000 0:00 am">
+		<fileset dir="${build}/sio29/ulib/${ulib_name}">
+			<include name="**/*.*" />
+		</fileset>
+	</touch>
+  </target>
+ 
+  <!-- juniversal Copy -->
+  <target name="juniversal_copy" >
+    <copy todir="${build}/org/mozilla/universalchardet">
+      <fileset dir="${src_classes}/org/mozilla/universalchardet" />
+    </copy>
+  </target>
+ 
+  <!-- data Copy -->
+  <target name="data_copy" >
+    <copy todir="${dst_datadir}">
+      <fileset dir="./data">
+      </fileset>
+    </copy>
+  </target>
+
+
+  
+  <!-- Initialize -->
+  <target name="init">
+    <mkdir dir="${execdir}" />
+    <antcall target="data_copy" inheritAll="false" />
+  </target>
+
+
+  <!-- compile java sources -->
+  <target name="compile" depends="init">
+    <mkdir dir="${build}" />
+    <javac srcdir="${source}" destdir="${build}" 
+    	debug="on" deprecation="off" 
+    	includeAntRuntime="no"
+		excludes="old/**,src/**,data/**,exec/**,com/**,down/**,android/**,upsrc/**"
+		classpath="${classpath}"
+    	encoding="Shift-JIS"
+    >
+<!--
+    	source="${java_ver}"
+    	target="${java_ver}"
+    >
+-->
+<!--
+	<compilerarg value="-Xlint:unchecked,deprecation" />
+-->
+	<compilerarg value="-Xdiags:verbose" />
+    </javac>
+  </target>
+
+  <!-- make jar -->
+  <target name="jar" >
+    <jar jarfile="${jarfile}" basedir="${build}">
+<!-- make regitiry and shortcur-->
+		<zipfileset includes="**/*" src="${roxes}"/>
+<!-- ssh library -->
+		<zipfileset includes="**/*" src="${orion_ssh2}"/>
+<!-- string convert utf8 -->
+		<zipfileset includes="**/*.class" src="${juniversal}"/>
+		<zipfileset includes="javazoom/jl/decoder/*" src="${jlayer}"/>
+		<zipfileset includes="**/*.**" src="${jorbis}"/>
+		<zipfileset includes="**/*.**" src="${commons_net}"/>
+		<zipfileset includes="**/*.**" src="${icu4j}"/>
+		<zipfileset includes="**/*.**" src="${jzlib}"/>
+		<zipfileset includes="**/*.**" src="${luaj}"/>
+		
+		<zipfileset includes="**/*.class" src="${umat}"/>
+		<zipfileset includes="**/*.class" src="${umat_j2d}"/>
+		<zipfileset includes="**/*.class" src="${usystem}"/>
+		<zipfileset includes="**/*.class" src="${usystem_j2d}"/>
+		<zipfileset includes="**/*.class" src="${uimage}"/>
+		<zipfileset includes="**/*.class" src="${uimage_j2d}"/>
+		<zipfileset includes="**/*.class" src="${utouch}"/>
+		<zipfileset includes="**/*.class" src="${utouch_j2d}"/>
+		<zipfileset includes="**/*.class" src="${ufont}"/>
+		<zipfileset includes="**/*.class" src="${ufont_j2d}"/>
+		<zipfileset includes="**/*.class" src="${ufile}"/>
+		<zipfileset includes="**/*.class" src="${ufile_url}"/>
+		<zipfileset includes="**/*.class" src="${ufile_j2d}"/>
+		<zipfileset includes="**/*.class,**/*.png" src="${udlgbase}"/>
+		<zipfileset includes="**/*.class" src="${udlgbase_j2d}"/>
+		<zipfileset includes="**/*.class" src="${ureg}"/>
+		<zipfileset includes="**/*.class" src="${ureg_j2d}"/>
+		<zipfileset includes="**/*.class" src="${doubleboot}"/>
+		<zipfileset includes="**/*.class" src="${doubleboot_j2d}"/>
+		<zipfileset includes="**/*.class" src="${usound}"/>
+		<zipfileset includes="**/*.class" src="${wave}"/>
+		<zipfileset includes="**/*.class" src="${usound_jsnd}"/>
+		<zipfileset includes="**/*.class" src="${vag}"/>
+		<zipfileset includes="**/*.class" src="${fmgen}"/>
+		<manifest>
+			<attribute name="Main-Class" value="${mainname}"/>
+			<attribute name="Class-Path" value="${jar_classpath}"/>
+		</manifest>
+	</jar>
+  </target>
+
+  <!-- run  -->
+  <target name="run" >
+    <java classname="test">
+    </java>
+  </target>
+
+  <!-- copy jsp sources -->
+  <target name="copy">
+    <copy todir="${build}">
+      <fileset dir="${htdocs}">
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- make javadoc -->
+  <target name="javadoc">
+    <delete dir="${javadoc}" />
+    <mkdir dir="${javadoc}" />
+    <javadoc sourcepath="${source}" packagenames="${PACKAGE}" destdir="${javadoc}" />
+  </target>
+
+  <!-- clean work file -->
+  <target name="clean">
+    <delete dir="${build}" />
+  </target>
+ 
+  <!-- clean_all work file -->
+  <target name="clean_all">
+    <antcall target="clean" inheritAll="false" />
+    <delete>
+      <fileset dir="." includes="*.class" />
+    </delete>
+  </target>
+  
+</project>
